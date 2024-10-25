@@ -5,7 +5,9 @@ Autores:
   - Florentina Ibarbia
   - Paula Costa Mendez
   - Martina Vandemortel
+
 Fecha: 25/10/2024
+
 Versión: 1.0
 
 **Objetivo:**
