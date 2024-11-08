@@ -6,34 +6,57 @@ import statistics
 app = Flask(__name__)
 client_stats = load_client_statistics()
 
+#Este endpoint (/hello) verifica que el servidor esté activo.
 @app.route('/hello', methods=['GET'])
 def hello():
     return "Welcome to The Weather API!"
 
 
-@app.route("/api/prometheus/statistics", methods=['GET'])
-def get_client_statistics():
-    stat_cl = load_client_statistics()
-    for c in stat_cl:
-        return jsonify(c.serialize())
+#Este endpoint devuelve todos los registros de clima en formato JSON.
+@app.route("/api/weather/statistics", methods=['GET'])
+def get_all_weather_statistics():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM weather")
+    records = cursor.fetchall()
+   
+    weather_data = [{"id": r[0], "date": r[1], "city": r[2], "max_temp": r[3], "min_temp": r[4]} for r in records]
+    return jsonify(weather_data)
 
-@app.route('/api/prometheus/statistics', methods=['POST'])
-def create_client_statistics():
-    client_req_json = request.json
-    save_client_statistics(client_req_json)
-    return jsonify(client_req_json)
+#Este endpoint permite agregar un nuevo registro de clima.
+@app.route('/api/weather/statistics', methods=['POST'])
+def create_weather_statistics():
+    new_data = request.json
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("""
+        INSERT INTO weather (date, city, max_temp, min_temp)
+        VALUES (?, ?, ?, ?)
+    """, (new_data['date'], new_data['city'], new_data['max_temp'], new_data['min_temp']))
+    db.commit()
+    return jsonify({"message": "Weather data added successfully"}), 201
 
+#Proporciona las estadísticas promedio de temperatura para una fecha específica.
+@app.route("/api/weather/statistics/reports/<date>", methods=['GET'])
+def get_weather_stat_by_date(date):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT max_temp, min_temp FROM weather WHERE date = ?", (date,))
+    records = cursor.fetchall()
 
-@app.route("/api/prometheus/statistics/reports/<date>", methods=['GET'])
-def get_stat_by_date(date):
-    date = request.args.get('date')
-    if date == None:
-        return jsonify({"error": "no date info given"})
-    else:
-        average_blood = statistics.mean([int(date.blood_sugar_level) for date in client_stats])
-        average_emotion = statistics.mean([int(date.emotion_level) for date in client_stats])
-        return jsonify({"average_blood_level": average_blood, "average_emotion_level": average_emotion})
+    if not records:
+        return jsonify({"error": "No data available for the given date"}), 404
 
+    max_temps = [r[0] for r in records]
+    min_temps = [r[1] for r in records]
+    average_max_temp = statistics.mean(max_temps)
+    average_min_temp = statistics.mean(min_temps)
+    
+    return jsonify({
+        "date": date,
+        "average_max_temp": average_max_temp,
+        "average_min_temp": average_min_temp
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
