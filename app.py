@@ -1,10 +1,10 @@
 from flask import Flask, jsonify, request
-from db.db_manager import save_wetaher_statistics
-from db.db_manager import load_weather_statistics
+from db.db_manager import save_client_statistics
+from db.db_manager import load_client_statistics
 import statistics
 
 app = Flask(__name__)
-weather_stats = load_weather_statistics()
+client_stats = load_client_statistics()
 
 #Este endpoint (/hello) verifica que el servidor esté activo.
 @app.route('/hello', methods=['GET'])
