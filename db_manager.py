@@ -8,7 +8,7 @@ def save_weather_statistics(info):
 
         writer = csv.DictWriter(weather_statistics_file, fieldnames=header)
 
-        if client_statistics_file.tell() == 0:
+        if weather_statistics_file.tell() == 0:
             writer.writeheader()
 
         writer.writerow(info)
@@ -20,7 +20,7 @@ def load_weather_statistics():
         rows = csv.DictReader(statistics_file)
 
         for row in rows:
-            client_statistics.append(
+            weather_statistics.append(
                 Report(
                     row['date'],
                     row['city'],
