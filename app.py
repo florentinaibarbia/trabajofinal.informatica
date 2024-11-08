@@ -8,7 +8,7 @@ client_stats = load_client_statistics()
 
 @app.route('/hello', methods=['GET'])
 def hello():
-    return "hello"
+    return "Welcome to The Weather API!"
 
 
 @app.route("/api/prometheus/statistics", methods=['GET'])
