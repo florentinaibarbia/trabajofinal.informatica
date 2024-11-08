@@ -2,25 +2,25 @@ import csv
 import statistics
 from models.product import Report
 
-def save_weather_statistics(info):
-    with open('db/statistics.csv', 'a') as weather_statistics_file:
+def save_client_statistics(info):
+    with open('db/statistics.csv', 'a') as cient_statistics_file:
         header = ['date', 'city', 'current_weather', 'weather_data']
 
-        writer = csv.DictWriter(weather_statistics_file, fieldnames=header)
+        writer = csv.DictWriter(client_statistics_file, fieldnames=header)
 
-        if weather_statistics_file.tell() == 0:
+        if clienr_statistics_file.tell() == 0:
             writer.writeheader()
 
         writer.writerow(info)
 
 
-def load_weather_statistics():
-    weather_statistics = []
+def load_client_statistics():
+    client_statistics = []
     with open('db/statistics.csv', 'r') as statistics_file:
         rows = csv.DictReader(statistics_file)
 
         for row in rows:
-            weather_statistics.append(
+            client_statistics.append(
                 Report(
                     row['date'],
                     row['city'],
@@ -31,7 +31,7 @@ def load_weather_statistics():
         return client_statistics
 
 def statistics_average():
-    weather_statistics = load_weather_statistics()
-    average_weather = statistics.mean([report.current_weather for report in weather_statistics])
-    average_data = statistics.mean([report.weather_data for report in weather_statistics])
+    client_statistics = load_client_statistics()
+    average_weather = statistics.mean([report.current_weather for report in client_statistics])
+    average_data = statistics.mean([report.weather_data for report in client_statistics])
     return average_weather, average_data
