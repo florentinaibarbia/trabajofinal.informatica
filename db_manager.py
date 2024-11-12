@@ -5,15 +5,13 @@ import sqlite3
 
 def save_europe_cities(info):
     with open('europe_cities.csv', 'a') as client_europe_cities_file:
-        header = ['date', 'city', 'weather_description', 'temp_max', 'temp_min','humidity']
-
+        header = ['date', 'city', 'weather_description', 'temp_max', 'temp_min', 'humidity']
         writer = csv.DictWriter(client_europe_cities_file, fieldnames=header)
 
         if client_europe_cities_file.tell() == 0:
             writer.writeheader()
 
         writer.writerow(info)
-
 
 def load_europe_cities():
     client_europe_cities = []
@@ -25,18 +23,20 @@ def load_europe_cities():
                 Report(
                     row['date'],
                     row['city'],
-                    row['weather.description'],
-                    row['temp_max']
-                    row['temp_min']
+                    row['weather_description'],
+                    row['temp_max'],
+                    row['temp_min'],
                     row['humidity']
                 )
             )
-        return client_europe_cities
+    return client_europe_cities
 
 def europe_cities_average():
     client_europe_cities = load_europe_cities()
-    average_weather = europe_cities.mean([report.temp_max and report.temp_min for report in client_europe_cities])
-    return average_weather
+    avg_temp_max = sum(float(report.temp_max) for report in client_europe_cities) / len(client_europe_cities)
+    avg_temp_min = sum(float(report.temp_min) for report in client_europe_cities) / len(client_europe_cities)
+    return {'avg_temp_max': avg_temp_max, 'avg_temp_min': avg_temp_min}
+
 '''
 
 DATABASE_NAME = "weather.db"  # Nombre de la base de datos
