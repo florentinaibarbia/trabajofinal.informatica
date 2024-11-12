@@ -2,6 +2,15 @@ import csv
 import europe_cities
 from product import Report
 import sqlite3
+import pandas as pd
+from sqlalchemy import create_engine
+
+# Cargar el archivo CSV en un DataFrame de pandas
+df = pd.read_csv('europe_cities.csv')
+
+# Crear una conexión SQLite y exportar el DataFrame a la base de datos
+engine = create_engine('sqlite:///weather.db')  # Cambié el nombre de la base de datos
+df.to_sql('europe_cities', engine, if_exists='replace', index=False)
 
 def save_europe_cities(info):
     with open('europe_cities.csv', 'a') as client_europe_cities_file:
@@ -68,3 +77,4 @@ def create_tables():
 # Llamada para crear las tablas
 create_tables()
 '''
+
