@@ -1,10 +1,10 @@
 from flask import Flask, jsonify, request
-from db.db_manager import save_client_statistics
-from db.db_manager import load_client_statistics
-import statistics
+from db_manager import save_europe_cities
+from db_manager import load_europe_cities
+import europe_cities
 
 app = Flask(__name__)
-client_stats = load_client_statistics()
+client_stats = load_europe_cities()
 
 #Este endpoint (/hello) verifica que el servidor esté activo.
 @app.route('/hello', methods=['GET'])
@@ -13,31 +13,31 @@ def hello():
 
 
 #Este endpoint devuelve todos los registros de clima en formato JSON.
-@app.route("/api/weather/statistics", methods=['GET'])
-def get_all_weather_statistics():
+@app.route("/api/weather/europe_cities", methods=['GET'])
+def get_all_europe_cities():
     db = get_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM weather")
     records = cursor.fetchall()
    
-    weather_data = [{"id": r[0], "date": r[1], "city": r[2], "max_temp": r[3], "min_temp": r[4]} for r in records]
+    weather_data = [{"id": r[0], "date": r[1], "city": r[2], "temp_max": r[3], "temp_min": r[4]} for r in records]
     return jsonify(weather_data)
 
 #Este endpoint permite agregar un nuevo registro de clima.
-@app.route('/api/weather/statistics', methods=['POST'])
-def create_weather_statistics():
+@app.route('/api/weather/europe_cities', methods=['POST'])
+def create_europe_cities():
     new_data = request.json
     db = get_db()
     cursor = db.cursor()
     cursor.execute("""
         INSERT INTO weather (date, city, max_temp, min_temp)
         VALUES (?, ?, ?, ?)
-    """, (new_data['date'], new_data['city'], new_data['max_temp'], new_data['min_temp']))
+    """, (new_data['date'], new_data['city'], new_data['temp_max'], new_data['temp_min']))
     db.commit()
     return jsonify({"message": "Weather data added successfully"}), 201
 
 #Proporciona las estadísticas promedio de temperatura para una fecha específica.
-@app.route("/api/weather/statistics/reports/<date>", methods=['GET'])
+@app.route("/api/weather/europe_cities/reports/<date>", methods=['GET'])
 def get_weather_stat_by_date(date):
     db = get_db()
     cursor = db.cursor()
@@ -47,10 +47,10 @@ def get_weather_stat_by_date(date):
     if not records:
         return jsonify({"error": "No data available for the given date"}), 404
 
-    max_temps = [r[0] for r in records]
-    min_temps = [r[1] for r in records]
-    average_max_temp = statistics.mean(max_temps)
-    average_min_temp = statistics.mean(min_temps)
+    temp_max = [r[0] for r in records]
+    temp_min = [r[1] for r in records]
+    average_max_temp = europe_cities.mean(temp_max)
+    average_min_temp = europe_cities.mean(temp_min)
     
     return jsonify({
         "date": date,
