@@ -3,7 +3,7 @@ import json
 
 def obtener_datos_meteorologicos(ciudad):
     # Tu API key de OpenWeather
-    api_key = 'tu_api_key_aqui'
+    api_key = 'b9b664210634f1de44c25b915a76028f'
     
     # URL de la API (usamos el endpoint de clima actual)
     url = f'http://api.openweathermap.org/data/2.5/weather?q={ciudad}&appid={api_key}&units=metric'
